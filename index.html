@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSS Only — Challenge Series</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:        #0b0b0f;
+      --surface:   #111118;
+      --border:    #1e1e2e;
+      --mist:      #22223a;
+      --text:      #e2e2f0;
+      --dim:       #6b6b8a;
+      --accent:    #c084fc;       /* violet — not the usual acid green */
+      --accent2:   #818cf8;       /* indigo complement */
+      --danger:    #f472b6;
+      --mono:      'DM Mono', monospace;
+      --display:   'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--display);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ──────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 180px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--dim);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--text); }
+
+    /* ── HERO ───────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      padding: 7rem 2.5rem 5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--accent);
+    }
+
+    .hero-sub {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--dim);
+      max-width: 480px;
+      line-height: 1.8;
+      font-weight: 300;
+    }
+
+    /* ── STAT ROW ───────────────────────────────────────── */
+    .stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-item span {
+      display: block;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-item small {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── SECTION LABEL ──────────────────────────────────── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── GRID OF CHALLENGES ─────────────────────────────── */
+    .challenges {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    /* ── CHALLENGE CARD ─────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    .card:hover { background: var(--mist); }
+
+    .card-tag {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .card p {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--dim);
+      line-height: 1.75;
+      font-weight: 300;
+    }
+
+    /* ── LIVE PREVIEW INSIDE CARD ───────────────────────── */
+    .preview {
+      margin-top: 1.75rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: var(--bg);
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── CHALLENGE 1: Pure CSS Toggle ───────────────────── */
+    .toggle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .css-toggle { display: none; }
+
+    .toggle-label {
+      width: 54px;
+      height: 28px;
+      background: var(--mist);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .toggle-label::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--dim);
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .css-toggle:checked + .toggle-label {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .css-toggle:checked + .toggle-label::after {
+      transform: translateX(26px);
+      background: var(--bg);
+    }
+
+    .toggle-hint {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── CHALLENGE 2: CSS Accordion ─────────────────────── */
+    .accordion-wrap { width: 100%; padding: 0 1rem; }
+
+    .acc-item { border-bottom: 1px solid var(--border); }
+
+    .acc-toggle { display: none; }
+
+    .acc-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+
+    .acc-label::after {
+      content: '+';
+      color: var(--accent);
+      font-size: 1rem;
+      line-height: 1;
+      transition: transform 0.25s;
+    }
+
+    .acc-toggle:checked ~ .acc-label::after {
+      transform: rotate(45deg);
+    }
+
+    .acc-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .acc-toggle:checked ~ .acc-body {
+      max-height: 80px;
+    }
+
+    .acc-body p {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--dim);
+      padding: 0.4rem 0 0.8rem;
+      line-height: 1.6;
+    }
+
+    /* ── CHALLENGE 3: CSS Tooltip ───────────────────────── */
+    .tooltip-demo {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .tip {
+      position: relative;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 2px;
+      cursor: default;
+      letter-spacing: 0.08em;
+    }
+
+    .tip::before {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.6rem;
+      padding: 0.3rem 0.6rem;
+      white-space: nowrap;
+      border-radius: 2px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .tip::after {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 5px solid transparent;
+      border-top-color: var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .tip:hover::before, .tip:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── CHALLENGE 4: CSS Modal ─────────────────────────── */
+    .modal-trigger { display: none; }
+
+    .modal-open-btn {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--bg);
+      background: var(--accent);
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    label.modal-open-btn { display: inline-block; cursor: pointer; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11,11,15,0.92);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-trigger:checked ~ .modal-overlay {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+      transform: translateY(16px);
+      transition: transform 0.3s;
+    }
+
+    .modal-trigger:checked ~ .modal-overlay .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-box h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .modal-box p {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--dim);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-close {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--dim);
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.9rem;
+      border-radius: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--text); border-color: var(--dim); }
+
+    /* ── CHALLENGE 5: CSS Progress Bar ──────────────────── */
+    .progress-stack { width: 100%; padding: 0 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .prog-row { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .prog-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+    }
+
+    .prog-track {
+      height: 3px;
+      background: var(--mist);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 999px;
+      animation: fillIn 1.2s ease forwards;
+      transform-origin: left;
+    }
+
+    @keyframes fillIn {
+      from { width: 0; }
+    }
+
+    .prog-fill.w90 { width: 90%; animation-delay: 0.1s; }
+    .prog-fill.w75 { width: 75%; animation-delay: 0.2s; }
+    .prog-fill.w60 { width: 60%; animation-delay: 0.3s; }
+
+    /* ── CHALLENGE 6: CSS Tabs ──────────────────────────── */
+    .tabs-wrap { width: 100%; padding: 0 1rem; }
+
+    .tab-radio { display: none; }
+
+    .tab-labels {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.75rem;
+    }
+
+    .tab-lbl {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--dim);
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -1px;
+    }
+
+    #tab1:checked ~ .tab-labels .lbl1,
+    #tab2:checked ~ .tab-labels .lbl2,
+    #tab3:checked ~ .tab-labels .lbl3 {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-panel {
+      display: none;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--dim);
+      line-height: 1.6;
+    }
+
+    #tab1:checked ~ .panels .p1,
+    #tab2:checked ~ .panels .p2,
+    #tab3:checked ~ .panels .p3 { display: block; }
+
+    /* ── CHALLENGE 7: CSS Card Flip ─────────────────────── */
+    .flip-scene {
+      width: 120px;
+      height: 80px;
+      perspective: 600px;
+    }
+
+    .flip-card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+    }
+
+    .flip-scene:hover .flip-card { transform: rotateY(180deg); }
+
+    .flip-front, .flip-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      border-radius: 2px;
+    }
+
+    .flip-front {
+      background: var(--mist);
+      border: 1px solid var(--border);
+      color: var(--dim);
+    }
+
+    .flip-back {
+      background: var(--accent);
+      color: var(--bg);
+      transform: rotateY(180deg);
+    }
+
+    /* ── CHALLENGE 8: CSS Glitch Text ───────────────────── */
+    .glitch-wrap {
+      position: relative;
+    }
+
+    .glitch {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      position: relative;
+      letter-spacing: -0.02em;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .glitch::before {
+      color: var(--accent);
+      animation: glitch1 2.5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    }
+
+    .glitch::after {
+      color: var(--accent2);
+      animation: glitch2 2.5s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    }
+
+    @keyframes glitch1 {
+      0%, 90%, 100% { transform: translate(0); }
+      92% { transform: translate(-3px, 1px); }
+      94% { transform: translate(3px, -1px); }
+      96% { transform: translate(-2px, 0); }
+    }
+
+    @keyframes glitch2 {
+      0%, 90%, 100% { transform: translate(0); }
+      91% { transform: translate(3px, 2px); }
+      93% { transform: translate(-3px, -2px); }
+      95% { transform: translate(2px, 1px); }
+    }
+
+    /* ── MODAL CARD OVERRIDE ────────────────────────────── */
+    .card.has-modal { position: static; }
+
+    /* ── FOOTER ─────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    footer p {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+    }
+
+    footer span {
+      color: var(--accent);
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 640px) {
+      header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .stats { flex-wrap: wrap; gap: 1.5rem; }
+      footer { flex-direction: column; gap: 0.75rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">css.only — series</div>
+    <nav>
+      <a href="#challenges">Challenges</a>
+      <a href="https://github.com" target="_blank">GitHub</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Pure CSS · No JavaScript</div>
+    <h1>Every<br/><em>effect.</em><br/>No script.</h1>
+    <p class="hero-sub">
+      A living collection of UI components built without a single line of JavaScript.
+      Hover, click, and interact — it's all CSS.
+    </p>
+    <div class="stats">
+      <div class="stat-item">
+        <span>08</span>
+        <small>Challenges</small>
+      </div>
+      <div class="stat-item">
+        <span>0</span>
+        <small>Lines of JS</small>
+      </div>
+      <div class="stat-item">
+        <span>100%</span>
+        <small>CSS Magic</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHALLENGES GRID -->
+  <section class="challenges" id="challenges">
+    <div class="section-label">Interactive Demos — try them</div>
+    <div class="grid">
+
+      <!-- 1. Toggle -->
+      <div class="card">
+        <div class="card-tag">Challenge 01 · Input Hack</div>
+        <h3>CSS Toggle Switch</h3>
+        <p>A fully functional on/off toggle using only a hidden checkbox and the adjacent sibling selector. No JS, no ARIA tricks.</p>
+        <div class="preview">
+          <div class="toggle-wrap">
+            <input type="checkbox" id="t1" class="css-toggle"/>
+            <label for="t1" class="toggle-label"></label>
+            <span class="toggle-hint">click to toggle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Accordion -->
+      <div class="card">
+        <div class="card-tag">Challenge 02 · :checked</div>
+        <h3>CSS Accordion</h3>
+        <p>Expand and collapse panels using max-height transitions triggered by hidden radio inputs — zero scripting required.</p>
+        <div class="preview">
+          <div class="accordion-wrap">
+            <div class="acc-item">
+              <input type="checkbox" id="a1" class="acc-toggle"/>
+              <label for="a1" class="acc-label">What is CSS-only?</label>
+              <div class="acc-body"><p>It means the interactivity is driven entirely by CSS selectors and pseudo-classes.</p></div>
+            </div>
+            <div class="acc-item">
+              <input type="checkbox" id="a2" class="acc-toggle"/>
+              <label for="a2" class="acc-label">Is it accessible?</label>
+              <div class="acc-body"><p>With careful semantic markup, yes — focus states and keyboard navigation still work.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Tooltip -->
+      <div class="card">
+        <div class="card-tag">Challenge 03 · ::before</div>
+        <h3>CSS Tooltips</h3>
+        <p>Hover-activated tooltips using <code>::before</code> pseudo-elements and <code>attr()</code> to pull content from data attributes.</p>
+        <div class="preview">
+          <div class="tooltip-demo">
+            <span class="tip" data-tip="Hover tip!">Hover me</span>
+            <span class="tip" data-tip="Pure CSS ✦">And me</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Modal -->
+      <div class="card has-modal">
+        <div class="card-tag">Challenge 04 · :target / :checked</div>
+        <h3>CSS Modal Dialog</h3>
+        <p>A fully animated modal using a hidden checkbox and the general sibling combinator. Opens, closes, fades — no JS.</p>
+        <div class="preview">
+          <input type="checkbox" id="modal1" class="modal-trigger"/>
+          <label for="modal1" class="modal-open-btn">Open Modal</label>
+          <div class="modal-overlay">
+            <div class="modal-box">
+              <h4>Pure CSS Modal ✦</h4>
+              <p>This dialog opened with zero JavaScript. The animation runs via CSS transitions triggered by :checked state on a hidden input.</p>
+              <label for="modal1" class="modal-close">Close</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Progress -->
+      <div class="card">
+        <div class="card-tag">Challenge 05 · @keyframes</div>
+        <h3>Animated Progress Bars</h3>
+        <p>Skill bars that animate on load using <code>@keyframes</code> and staggered animation delays. No IntersectionObserver needed.</p>
+        <div class="preview">
+          <div class="progress-stack">
+            <div class="prog-row">
+              <div class="prog-label"><span>HTML & CSS</span><span>90%</span></div>
+              <div class="prog-track"><div class="prog-fill w90"></div></div>
+            </div>
+            <div class="prog-row">
+              <div class="prog-label"><span>Animation</span><span>75%</span></div>
+              <div class="prog-track"><div class="prog-fill w75"></div></div>
+            </div>
+            <div class="prog-row">
+              <div class="prog-label"><span>Layout</span><span>60%</span></div>
+              <div class="prog-track"><div class="prog-fill w60"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Tabs -->
+      <div class="card">
+        <div class="card-tag">Challenge 06 · Radio Inputs</div>
+        <h3>CSS Tab Switcher</h3>
+        <p>Tab navigation powered entirely by radio buttons and the general sibling combinator. Fully keyboard navigable.</p>
+        <div class="preview">
+          <div class="tabs-wrap">
+            <input type="radio" name="tabs" id="tab1" class="tab-radio" checked/>
+            <input type="radio" name="tabs" id="tab2" class="tab-radio"/>
+            <input type="radio" name="tabs" id="tab3" class="tab-radio"/>
+            <div class="tab-labels">
+              <label for="tab1" class="tab-lbl lbl1">Design</label>
+              <label for="tab2" class="tab-lbl lbl2">Code</label>
+              <label for="tab3" class="tab-lbl lbl3">Ship</label>
+            </div>
+            <div class="panels">
+              <div class="tab-panel p1">Design systems start with tokens and intention.</div>
+              <div class="tab-panel p2">Code is the material. CSS is the craft.</div>
+              <div class="tab-panel p3">Ship it. Iterate. Stay curious.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Card Flip -->
+      <div class="card">
+        <div class="card-tag">Challenge 07 · 3D Transform</div>
+        <h3>CSS Card Flip</h3>
+        <p>A 3D card flip on hover using <code>transform-style: preserve-3d</code> and <code>backface-visibility</code>. No JavaScript required.</p>
+        <div class="preview">
+          <div class="flip-scene">
+            <div class="flip-card">
+              <div class="flip-front">hover me ✦</div>
+              <div class="flip-back">pure css ✦</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Glitch -->
+      <div class="card">
+        <div class="card-tag">Challenge 08 · @keyframes</div>
+        <h3>CSS Glitch Text</h3>
+        <p>A looping glitch animation using layered <code>::before</code> and <code>::after</code> pseudo-elements with offset clip-paths and color splits.</p>
+        <div class="preview">
+          <div class="glitch-wrap">
+            <div class="glitch" data-text="GLITCH">GLITCH</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Built with <span>pure CSS</span> · No frameworks · No JavaScript</p>
+    <p>⟶ Star on <span>GitHub</span> to follow the series</p>
+  </footer>
+
+</body>
+</html>
